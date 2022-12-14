@@ -1,9 +1,11 @@
 import { FC } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { Button, Navbar } from "@nextui-org/react";
+import { Avatar, Button, Navbar, Grid } from "@nextui-org/react";
 
 export const Header: FC = () => {
   const { data: session } = useSession();
+
+  console.log(session?.accessToken);
 
   return (
     <Navbar isBordered variant="sticky">
@@ -18,9 +20,16 @@ export const Header: FC = () => {
       </Navbar.Content>
       <Navbar.Content>
         {session && (
-          <Navbar.Link color="primary" onClick={() => signOut()}>
-            Sign out
-          </Navbar.Link>
+          <Grid.Container alignItems="center" gap={2}>
+            <Grid>
+              <Avatar size="lg" src={session.user.image} />
+            </Grid>
+            <Grid>
+              <Navbar.Link color="primary" onClick={() => signOut()}>
+                Sign out
+              </Navbar.Link>
+            </Grid>
+          </Grid.Container>
         )}
         {!session && (
           <Button color="primary" auto flat onClick={() => signIn()}>

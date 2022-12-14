@@ -1,8 +1,15 @@
 import type { NextPage } from "next";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 export const Home: NextPage = () => {
   const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.error === "RefreshAccessTokenError") {
+      signIn(); // Force sign in to hopefully resolve error
+    }
+  }, [session]);
 
   return (
     <>
