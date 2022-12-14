@@ -1,20 +1,20 @@
 import type { NextPage } from "next";
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
-import Button from "../components/login-btn";
+import { useSession } from "next-auth/react";
 
 export const Home: NextPage = () => {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Cyclist Studio App</title>
-      </Head>
+  const { data: session } = useSession();
 
+  return (
+    <>
       <main>
-        <h2>Welcome</h2>
-        <Button />
+        {!session && <> Please login to use the platform </>}
+        {session && (
+          <>
+            Welcome back <strong>{session.user?.name} </strong>
+          </>
+        )}
       </main>
-    </div>
+    </>
   );
 };
 
