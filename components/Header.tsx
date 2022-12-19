@@ -1,19 +1,21 @@
-import { FC } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Avatar, Button, Navbar, Grid } from "@nextui-org/react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { FC } from "react";
 
 export const Header: FC = () => {
   const { data: session } = useSession();
 
-  console.log(session?.accessToken);
-
   return (
     <Navbar isBordered variant="sticky">
       <Navbar.Brand>
-        <p>Cyclist App</p>
+        <Link href={"/"}>Cyclist Pro Data</Link>
       </Navbar.Brand>
       <Navbar.Content hideIn="xs">
-        {/*<Navbar.Link>Features</Navbar.Link>*/}
+        {session?.user && (
+          <Navbar.Link href={"/profile"}>My Profile</Navbar.Link>
+        )}
         {/*<Navbar.Link isActive>Customers</Navbar.Link>*/}
         {/*<Navbar.Link>Pricing</Navbar.Link>*/}
         {/*<Navbar.Link>Company</Navbar.Link>*/}
@@ -26,14 +28,14 @@ export const Header: FC = () => {
             </Grid>
             <Grid>
               <Navbar.Link color="primary" onClick={() => signOut()}>
-                Sign out
+                Log out
               </Navbar.Link>
             </Grid>
           </Grid.Container>
         )}
         {!session && (
           <Button color="primary" auto flat onClick={() => signIn()}>
-            Sign in
+            Log in
           </Button>
         )}
       </Navbar.Content>

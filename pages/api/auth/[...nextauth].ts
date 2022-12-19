@@ -28,7 +28,7 @@ async function refreshAccessToken(token: any) {
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+      accessTokenExpires: refreshedTokens.expires_in,
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
     };
   } catch (error) {
@@ -57,7 +57,7 @@ export const authOptions = {
   session: {
     strategy: "jwt",
     jwt: true,
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 1 * 24 * 60 * 60, // 1 day
   },
   callbacks: {
     async jwt(data: any) {
@@ -67,14 +67,14 @@ export const authOptions = {
       if (account && user) {
         return {
           accessToken: account.access_token,
-          accessTokenExpires: Date.now() + account.expires_at * 1000,
+          accessTokenExpires: account.expires,
           refreshToken: account.refresh_token,
           user,
         };
       }
 
       // Return previous token if the access token has not expired yet
-      if (Date.now() < token.accessTokenExpires) {
+      if (Date.now() > token.accessTokenExpires) {
         return token;
       }
 
@@ -85,6 +85,8 @@ export const authOptions = {
       const { session, token } = data;
       session.user = token.user;
       session.accessToken = token.accessToken;
+      session.accessTokenExpires = token.accessTokenExpires;
+      session.refreshToken = token.refreshToken;
       session.error = token.error;
 
       return session;
