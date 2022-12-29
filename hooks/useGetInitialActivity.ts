@@ -6,7 +6,7 @@ import { Activity } from "../types/types";
 
 export const useGetInitialActivity = () => {
   const { data: session } = useSession();
-  const [activity, setActivity] = useState<Array<Activity>>([]);
+  const [activities, setActivities] = useState<Array<Activity>>([]);
   const [error, setError] = useState("");
   const [activityLoading, setActivityLoading] = useState(true);
 
@@ -19,7 +19,7 @@ export const useGetInitialActivity = () => {
     axios
       .get<Array<Activity>>(`${baseUrl}/athlete/activities`, config)
       .then((res) => {
-        setActivity(res.data);
+        setActivities(res.data);
       })
       .catch((err) => {
         setError(err);
@@ -33,5 +33,5 @@ export const useGetInitialActivity = () => {
     fetchData();
   }, [session]);
 
-  return { activity, error, activityLoading };
+  return { activities, error, activityLoading };
 };

@@ -1,16 +1,18 @@
 import { useGetProfileData } from "../hooks/useGetProfileData";
-import { Grid, Card, Col, Row, Text, Loading } from "@nextui-org/react";
+import { Grid, Text, Loading } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { USER_STATUS } from "../utils";
 import { NextPage } from "next";
 import { useGetInitialActivity } from "../hooks/useGetInitialActivity";
+import { LastActivitiesTable } from "../components/LastActivitiesTable";
+import { Activity } from "../types/types";
 
 const Profile: NextPage = () => {
   const { data: session, status } = useSession();
   const { response, loading } = useGetProfileData();
-  const { activity, activityLoading } = useGetInitialActivity();
+  const { activities, activityLoading } = useGetInitialActivity();
   const router = useRouter();
 
   useEffect(() => {
@@ -19,7 +21,13 @@ const Profile: NextPage = () => {
     }
   }, [status]);
 
-  if (status === USER_STATUS.LOADING || loading || activityLoading || !response)
+  if (
+    status === USER_STATUS.LOADING ||
+    loading ||
+    activityLoading ||
+    !response ||
+    !activities
+  )
     return (
       <Grid.Container
         css={{ textAlign: "center", marginTop: 100 }}
@@ -30,10 +38,15 @@ const Profile: NextPage = () => {
       </Grid.Container>
     );
 
-  console.log(activity);
+  const cyclingActivities: Activity[] = activities.filter(
+    (el) => el.type === "Ride" || el.type === "VirtualRide"
+  );
+
+  let watts = 0;
+  cyclingActivities.map((el) => (watts += el.average_watts));
   return (
     <>
-      <Grid.Container css={{ textAlign: "left", marginLeft: "8%" }}>
+      <Grid.Container justify="space-between" css={{ padding: "0 8%" }}>
         <Grid>
           <Text
             h1
@@ -63,42 +76,60 @@ const Profile: NextPage = () => {
             </Text>
           </Grid>
         </Grid>
-      </Grid.Container>
-      <Grid.Container gap={2} justify="center">
-        <Grid xs={12} sm={5}>
-          <Card css={{ w: "40%", h: "200px" }}>
-            <Card.Body css={{ p: 0 }}>
-              <Card.Image
-                src={response.profile}
-                width="100%"
-                height="100%"
-                objectFit="cover"
-                alt="Card example background"
-              />
-            </Card.Body>
-            <Card.Footer
-              isBlurred
+        <Grid>
+          <Text
+            h1
+            size={60}
+            css={{
+              textAlign: "end",
+              textGradient: "45deg, $red600 -10%, $green700 100%",
+            }}
+            weight="bold"
+          >
+            Get inside
+          </Text>
+          <Grid direction="row">
+            <Text
+              h1
+              size={70}
               css={{
-                position: "absolute",
-                bgBlur: "#ffffff66",
-                height: "-webkit-fill-available",
-                borderTop:
-                  "$borderWeights$light solid rgba(255, 255, 255, 0.2)",
-                bottom: 0,
-                zIndex: 1,
-                backdropFilter: "saturate(180%) blur(2px)",
+                textAlign: "end",
+                textGradient: "45deg, $red600 -20%, $yellow600 100%",
               }}
+              weight="bold"
             >
-              <Row>
-                <Col>
-                  <Text h3 color="white">
-                    Your checklist for better sleep
-                  </Text>
-                </Col>
-              </Row>
-            </Card.Footer>
-          </Card>
+              Your stats
+            </Text>
+          </Grid>
+          <Text
+            css={{
+              textAlign: "end",
+            }}
+            size={70}
+          >
+            <span role="img" aria-label="sheep">
+              🚴🏼
+            </span>
+          </Text>
         </Grid>
+      </Grid.Container>
+      <Grid.Container gap={2} justify="center" css={{ padding: "0 8%" }}>
+        <Text
+          css={{
+            textAlign: "center",
+          }}
+          size={40}
+        >
+          You had <strong>{cyclingActivities.length}</strong> training sessions
+          within last 30 days with average power{" "}
+          <strong>
+            {Boolean(Math.round(watts / cyclingActivities.length))
+              ? Math.round(watts / cyclingActivities.length)
+              : "..."}
+          </strong>{" "}
+          watts
+        </Text>
+        <LastActivitiesTable activities={cyclingActivities} />
       </Grid.Container>
     </>
   );
