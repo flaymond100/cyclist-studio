@@ -1,25 +1,46 @@
 import { useGetProfileData } from "../hooks/useGetProfileData";
-import { Grid, Text, Loading } from "@nextui-org/react";
+import { Grid, Text, Loading, Input, Button } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { USER_STATUS } from "../utils";
 import { NextPage } from "next";
 import { useGetInitialActivity } from "../hooks/useGetInitialActivity";
 import { LastActivitiesTable } from "../components/LastActivitiesTable";
 import { Activity } from "../types/types";
+import { AppContext } from "../context/state";
+import {LastfmLoginModal} from "../components/LastfmLoginModal";
 
 const Profile: NextPage = () => {
   const { data: session, status } = useSession();
   const { response, loading } = useGetProfileData();
   const { activities, activityLoading } = useGetInitialActivity();
   const router = useRouter();
+  const { lastfmUser } = useContext(AppContext);
+  const [avarageHR, setAvarageHR] = useState<number>(0);
+  const [cyclingActivities, setCyclingActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
     if (status === USER_STATUS.DENY) {
       router.push("/error/unauthorized");
     }
   }, [status]);
+
+  useEffect(() => {
+    const act = activities.filter(
+      (el) => el.type === "Ride" || el.type === "VirtualRide"
+    );
+    act && setCyclingActivities(act);
+    const HR =
+      cyclingActivities
+        .map((el) => el.average_heartrate)
+        .reduce(
+          (previousValue, currentValue) => (previousValue += currentValue),
+          0
+        ) / cyclingActivities.length;
+
+    HR && setAvarageHR(HR);
+  }, [activities]);
 
   if (
     status === USER_STATUS.LOADING ||
@@ -38,14 +59,14 @@ const Profile: NextPage = () => {
       </Grid.Container>
     );
 
-  const cyclingActivities: Activity[] = activities.filter(
-    (el) => el.type === "Ride" || el.type === "VirtualRide"
-  );
 
   let watts = 0;
   cyclingActivities.map((el) => (watts += el.average_watts));
+  console.log(Boolean(lastfmUser))
+
   return (
-    <>
+      <>
+        { Boolean(lastfmUser) ?  null : <LastfmLoginModal/>}
       <Grid.Container justify="space-between" css={{ padding: "0 8%" }}>
         <Grid>
           <Text
@@ -125,9 +146,12 @@ const Profile: NextPage = () => {
           <strong>
             {Boolean(Math.round(watts / cyclingActivities.length))
               ? Math.round(watts / cyclingActivities.length)
-              : "..."}
+              : "calculating..."}
           </strong>{" "}
-          watts
+          watts and average heart rate{" "}
+          <strong>
+            {avarageHR ? Math.floor(avarageHR) : "calculating...."}
+          </strong>
         </Text>
         <LastActivitiesTable activities={cyclingActivities} />
       </Grid.Container>

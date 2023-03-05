@@ -3,37 +3,19 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { baseUrl } from "../utils";
 
-type ActivityStatsInterface = {
-  watts: {
-    data: [number];
-    original_size: number;
-    resolution: string;
-    series_type: string;
-  };
-  distance: {
-    data: [number];
-    original_size: number;
-    resolution: string;
-    series_type: string;
-  };
-  cadence: {
-    data: [number];
-    original_size: number;
-    resolution: string;
-    series_type: string;
-  };
-  heartrate: {
-    data: [number];
-    original_size: number;
-    resolution: string;
-    series_type: string;
-  };
-  time: {
-    data: [number];
-    original_size: number;
-    resolution: string;
-    series_type: string;
-  };
+export type ActivityStatsInterface = {
+  watts: SingleActivityInterface;
+  distance: SingleActivityInterface;
+  cadence: SingleActivityInterface;
+  heartrate: SingleActivityInterface;
+  time: SingleActivityInterface;
+};
+
+export type SingleActivityInterface = {
+  data: [number];
+  original_size: number;
+  resolution: string;
+  series_type: string;
 };
 
 export const useGetActivityStats = (id: string | string[] | undefined) => {
