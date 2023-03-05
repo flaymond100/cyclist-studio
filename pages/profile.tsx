@@ -1,15 +1,15 @@
-import { useGetProfileData } from "../hooks/useGetProfileData";
-import { Grid, Text, Loading, Input, Button } from "@nextui-org/react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
-import { USER_STATUS } from "../utils";
-import { NextPage } from "next";
-import { useGetInitialActivity } from "../hooks/useGetInitialActivity";
-import { LastActivitiesTable } from "../components/LastActivitiesTable";
-import { Activity } from "../types/types";
-import { AppContext } from "../context/state";
-import {LastfmLoginModal} from "../components/LastfmLoginModal";
+import { useGetProfileData } from '../hooks/useGetProfileData';
+import { Grid, Text, Loading, Input, Button } from '@nextui-org/react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
+import { USER_STATUS } from '../utils';
+import { NextPage } from 'next';
+import { useGetInitialActivity } from '../hooks/useGetInitialActivity';
+import { LastActivitiesTable } from '../components/LastActivitiesTable';
+import { Activity } from '../types/types';
+import { AppContext } from '../context/state';
+import { LastfmLoginModal } from '../components/LastfmLoginModal';
 
 const Profile: NextPage = () => {
   const { data: session, status } = useSession();
@@ -22,13 +22,13 @@ const Profile: NextPage = () => {
 
   useEffect(() => {
     if (status === USER_STATUS.DENY) {
-      router.push("/error/unauthorized");
+      router.push('/error/unauthorized');
     }
   }, [status]);
 
   useEffect(() => {
     const act = activities.filter(
-      (el) => el.type === "Ride" || el.type === "VirtualRide"
+      (el) => el.type === 'Ride' || el.type === 'VirtualRide'
     );
     act && setCyclingActivities(act);
     const HR =
@@ -51,7 +51,7 @@ const Profile: NextPage = () => {
   )
     return (
       <Grid.Container
-        css={{ textAlign: "center", marginTop: 100 }}
+        css={{ textAlign: 'center', marginTop: 100 }}
         justify="center"
         alignItems="center"
       >
@@ -59,21 +59,20 @@ const Profile: NextPage = () => {
       </Grid.Container>
     );
 
-
   let watts = 0;
   cyclingActivities.map((el) => (watts += el.average_watts));
-  console.log(Boolean(lastfmUser))
+  console.log(Boolean(lastfmUser));
 
   return (
-      <>
-        { Boolean(lastfmUser) ?  null : <LastfmLoginModal/>}
-      <Grid.Container justify="space-between" css={{ padding: "0 8%" }}>
+    <>
+      {Boolean(lastfmUser) ? null : <LastfmLoginModal />}
+      <Grid.Container justify="space-between" css={{ padding: '0 8%' }}>
         <Grid>
           <Text
             h1
             size={60}
             css={{
-              textGradient: "45deg, $purple600 -20%, $pink600 100%",
+              textGradient: '45deg, $purple600 -20%, $pink600 100%',
             }}
             weight="bold"
           >
@@ -84,7 +83,7 @@ const Profile: NextPage = () => {
               h1
               size={70}
               css={{
-                textGradient: "45deg, $yellow600 -20%, $red600 100%",
+                textGradient: '45deg, $yellow600 -20%, $red600 100%',
               }}
               weight="bold"
             >
@@ -102,8 +101,8 @@ const Profile: NextPage = () => {
             h1
             size={60}
             css={{
-              textAlign: "end",
-              textGradient: "45deg, $red600 -10%, $green700 100%",
+              textAlign: 'end',
+              textGradient: '45deg, $red600 -10%, $green700 100%',
             }}
             weight="bold"
           >
@@ -114,8 +113,8 @@ const Profile: NextPage = () => {
               h1
               size={70}
               css={{
-                textAlign: "end",
-                textGradient: "45deg, $red600 -20%, $yellow600 100%",
+                textAlign: 'end',
+                textGradient: '45deg, $red600 -20%, $yellow600 100%',
               }}
               weight="bold"
             >
@@ -124,7 +123,7 @@ const Profile: NextPage = () => {
           </Grid>
           <Text
             css={{
-              textAlign: "end",
+              textAlign: 'end',
             }}
             size={70}
           >
@@ -134,23 +133,23 @@ const Profile: NextPage = () => {
           </Text>
         </Grid>
       </Grid.Container>
-      <Grid.Container gap={2} justify="center" css={{ padding: "0 8%" }}>
+      <Grid.Container gap={2} justify="center" css={{ padding: '0 8%' }}>
         <Text
           css={{
-            textAlign: "center",
+            textAlign: 'center',
           }}
           size={40}
         >
           You had <strong>{cyclingActivities.length}</strong> training sessions
-          within last 30 days with average power{" "}
+          within last 30 days with average power{' '}
           <strong>
             {Boolean(Math.round(watts / cyclingActivities.length))
               ? Math.round(watts / cyclingActivities.length)
-              : "calculating..."}
-          </strong>{" "}
-          watts and average heart rate{" "}
+              : 'calculating...'}
+          </strong>{' '}
+          watts and average heart rate{' '}
           <strong>
-            {avarageHR ? Math.floor(avarageHR) : "calculating...."}
+            {avarageHR ? Math.floor(avarageHR) : 'calculating....'}
           </strong>
         </Text>
         <LastActivitiesTable activities={cyclingActivities} />
